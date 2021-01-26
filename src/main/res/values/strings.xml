@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Material FileDIFF</string>
+    <string name="tab_text_1">File singolo</string>
+    <string name="tab_text_2">Batch Files</string>
+    <string name="tab_text_3">Confronta</string>
+    <string name="calcola_checksum">Calcola checksum</string>
+    <string name="copia">Copia checksum</string>
+    <string name="checksum_ok">Il checksum coincide</string>
+    <string name="checksum_ko">Il checksum non coincide</string>
+</resources>
