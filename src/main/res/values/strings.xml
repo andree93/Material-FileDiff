@@ -7,4 +7,8 @@
     <string name="copia">Copia checksum</string>
     <string name="checksum_ok">Il checksum coincide</string>
     <string name="checksum_ko">Il checksum non coincide</string>
+    <string name="confronta_checksum">Confronta checksum</string>
+    <string name="checksum_calcolato">Checksum calcolato:</string>
+    <string name="file_selezionato">File selezionato:</string>
+    <string name="file_selezionati">File selezionati:</string>
 </resources>

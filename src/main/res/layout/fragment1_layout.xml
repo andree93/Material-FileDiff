@@ -19,10 +19,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/confronta_checksum_button"
+        android:id="@+id/jsonExportButton"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:text="Confronta checksum"
+        android:text="@string/confronta_checksum"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.895"
@@ -34,7 +34,7 @@
         android:id="@+id/checksum_calculated_tv"
         android:layout_width="400dp"
         android:layout_height="50dp"
-        android:text="Checksum calcolato:"
+        android:text="@string/checksum_calcolato"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +60,7 @@
         android:id="@+id/file_selected_tv"
         android:layout_width="180dp"
         android:layout_height="40dp"
-        android:text="File selezionato:"
+        android:text="@string/file_selezionato"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,7 +95,7 @@
 
     <ImageButton
         android:id="@+id/file_pick_button"
-        android:layout_width="51dp"
+        android:layout_width="55dp"
         android:layout_height="55dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

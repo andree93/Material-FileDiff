@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 public class FragmentUtils {
-    private static final int PICK_SINGLE_FILE = 1;
+    private static final int PICK_SINGLE_FILE_RESULT_CODE = 1;
+    private static final int PICK_MULTIPLE_FILES_RESULT_CODE = 2;
+    private static final int SAVE_FILE_RESULT_CODE = 3;
+
 
     public void pickFile(Fragment fr) {
 
@@ -18,7 +21,7 @@ public class FragmentUtils {
         // system file picker when it loads.
         //intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        fr.startActivityForResult(intent, PICK_SINGLE_FILE);
+        fr.startActivityForResult(intent, PICK_SINGLE_FILE_RESULT_CODE);
 
     }
 
@@ -34,7 +37,18 @@ public class FragmentUtils {
         // system file picker when it loads.
         //intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        fr.startActivityForResult(intent, PICK_SINGLE_FILE);
+        fr.startActivityForResult(intent, PICK_MULTIPLE_FILES_RESULT_CODE);
+
+    }
+
+    public void writeFile(Fragment fr){
+        String fileName="exportedResults.json";
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        fr.startActivityForResult(intent, SAVE_FILE_RESULT_CODE);
 
     }
 }
