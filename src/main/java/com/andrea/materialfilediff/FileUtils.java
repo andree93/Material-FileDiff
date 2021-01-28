@@ -3,6 +3,7 @@ package com.andrea.materialfilediff;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -55,9 +56,6 @@ public class FileUtils {
 
     public static String JSONObjectToString(JSONObject jo){
         String result = "";
-
-        JSONObject tmpjsonob;
-
         try {
             result = jo.toString(0);
         } catch (JSONException e) {
@@ -69,10 +67,10 @@ public class FileUtils {
 
 
 
-    public static FileRepresentation calcolaChecksumFromUri(Uri uri, Activity activity ) {
+    public static FileRepresentation calcolaChecksumFromUri(Uri uri, Context context ) {
         ParcelFileDescriptor pfd = null;
-        pfd = getFileDescriptorFromUri(uri, activity);
-        String filename =  UriToFileName(uri, activity);
+        pfd = getFileDescriptorFromUri(uri, context);
+        String filename =  UriToFileName(uri, context);
         String hash=null;
         try(FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd)){
             hash = new String(Hex.encodeHex(DigestUtils.md5(fis)));
@@ -87,11 +85,31 @@ public class FileUtils {
     }
 
 
-    public static List<Uri> clipDataToUriList(ClipData clipData, Activity activity){
+    public static List<Uri> clipDataToUriList(ClipData clipData){
         List<Uri> uriList = new ArrayList<>();
-        for(int i = 0; i < clipData.getItemCount(); i++) {
-            Uri uri = clipData.getItemAt(i).getUri();
-            uriList.add(uri);
+        if (clipData != null){
+            for(int i = 0; i < clipData.getItemCount(); i++) {
+                Uri uri = clipData.getItemAt(i).getUri();
+                uriList.add(uri);
+            }
+        }
+        return uriList;
+    }
+
+
+    public static List<Uri> clipDataToUriList(Intent data){
+        List<Uri> uriList = new ArrayList<>();
+        if( data != null){
+            ClipData clipData = data.getClipData();
+            if (clipData != null){
+                for(int i = 0; i < clipData.getItemCount(); i++) {
+                    Uri uri = clipData.getItemAt(i).getUri();
+                    uriList.add(uri);
+                }
+            } else{
+                uriList.add(data.getData());
+            }
+
         }
         return uriList;
     }
@@ -112,10 +130,10 @@ public class FileUtils {
     }
 
 
-    public static ParcelFileDescriptor getFileDescriptorFromUri(Uri uri, Activity activity){
+    public static ParcelFileDescriptor getFileDescriptorFromUri(Uri uri, Context context){
         ParcelFileDescriptor pfd = null;
         try {
-            pfd = activity.getApplicationContext().getContentResolver().openFileDescriptor(uri, "r");
+            pfd = context.getContentResolver().openFileDescriptor(uri, "r");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -123,10 +141,10 @@ public class FileUtils {
     }
 
 
-    public  static boolean saveJSONExternalStorageFromUri(Uri uri, JSONObject jo,  Fragment fr){
+    public  static boolean saveJSONExternalStorageFromUri(Uri uri, JSONObject jo, Context context){
         boolean success = false;
         String jsonParsed = JSONObjectToString(jo);
-        try(OutputStream outputStream =  fr.getActivity().getContentResolver().openOutputStream(uri)){
+        try(OutputStream outputStream =  context.getContentResolver().openOutputStream(uri)){
 
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));

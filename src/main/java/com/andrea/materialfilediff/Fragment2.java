@@ -14,15 +14,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Fragment2 extends Fragment  implements View.OnClickListener, CommunicationInterface {
+    Frag2ViewModel mViewModel;
+
     public static final int PICK_MULTIPLE_FILES_RESULT_CODE = 2;
     public static final int SAVE_FILE_RESULT_CODE = 3;
     ImageButton files_pick_button = null;
@@ -30,13 +31,14 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     Button calcola_checksum_button = null;
     Button showProgressBar = null;
     Button jsonExportButton = null;
+    Button button_stop = null;
     ProgressBar progressBar = null;
-    FragmentUtils fu = null;
-    List<Uri> uriList;
+    //CircleProgressBar circleProgressBar = null;
+    List<Uri> uriList = null;
     List<String> fileNames = null;
-    int remainingItems = 0;
+    Async2 async2 = new Async2();
 
-    AsyncUtils at = new AsyncUtils();
+
 
 
     @Nullable
@@ -44,14 +46,24 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment2_layout, container, false);
-        fu = new FragmentUtils();
+        mViewModel = new ViewModelProvider(this).get(Frag2ViewModel.class);
+
         uriList = new ArrayList<Uri>();
 
         files_pick_button = (ImageButton) view.findViewById(R.id.file_pick_button);
         selected_files_counter = (TextView) view.findViewById(R.id.selected_files_counter);
         calcola_checksum_button = (Button) view.findViewById(R.id.calcola_checksum_button);
         jsonExportButton = (Button) view.findViewById(R.id.jsonExportButton);
-        jsonExportButton.setEnabled(false);
+
+        button_stop = (Button) view.findViewById(R.id.button_stop);
+
+
+        //circleProgressBar = view.findViewById(R.id.line_progress);
+
+        button_stop.setOnClickListener(this);
+
+
+
 
 
 
@@ -62,6 +74,12 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         calcola_checksum_button.setOnClickListener(this);
         jsonExportButton.setOnClickListener(this);
 
+        showSelected_files_counter_tv(mViewModel.getSelected_files_counter_tv());
+        setJsonExportButtonEnabled(mViewModel.isJsonExportButton());
+
+
+
+
 
         return view;
     }
@@ -71,21 +89,35 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.file_pick_button:
-                fu.pickFiles(this);
+                FragmentUtils.pickFile(this, true);
                 break;
             case R.id.showProgressBar:
                 this.enableProgressBar();
                 this.testProgressbar();
                 break;
             case R.id.calcola_checksum_button:{
-
-                at.submitWork(uriList,getActivity(),this);
-                jsonExportButton.setEnabled(true);
+                if (uriList != null && uriList.size()>0){
+                    setShowProgressBar(uriList.size());
+                    async2.addWorks(uriList, getActivity().getApplicationContext(),this);
+                } else{
+                    Log.d("Errore", "Lista URI Vuota");
+                }
+                break;
 
                 }
             case R.id.jsonExportButton:
-                fu.writeFile(this);
+                FragmentUtils.writeFile(this);
                 break;
+
+            case R.id.button_stop:{
+                disableProgressBar();
+                setJsonExportButtonEnabled(false);
+                this.uriList = null;
+                async2.dispose();
+                async2 = new Async2(); //Devo capire il motivo. Pur chiamando i metodi dispose() e clear(), la successiva aggiunta di nuovi lavori dà luogo a comportamenti anomali
+            }
+            break;
+
 
             default:
                 break;
@@ -97,23 +129,33 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         //
     }
 
+    public void showSelected_files_counter_tv(int files){
+        selected_files_counter.setText(Integer.toString(files));
+        mViewModel.setSelected_files_counter_tv(files);
+    }
+
+    public void setJsonExportButtonEnabled(boolean enabled){
+        jsonExportButton.setEnabled(enabled);
+        mViewModel.setJsonExportButton(enabled);
+    }
+
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICK_MULTIPLE_FILES_RESULT_CODE) {
             if (data != null) { // checking empty selection
-                uriList = FileUtils.clipDataToUriList(data.getClipData(), getActivity());
+                uriList = FileUtils.clipDataToUriList(data);
                 fileNames = FileUtils.uriListToFileNameList(uriList, getContext());
-                setSelected_files_counter(uriList.size());
+                showSelected_files_counter_tv(uriList.size());
             }
         } else if(requestCode == SAVE_FILE_RESULT_CODE){
 
             if ( data != null){
-                Uri uri2 = data.getData();
-                ArrayList<FileRepresentation> li = at.getFileRepresentationList();
+                Uri uri = data.getData();
+                ArrayList<FileRepresentation> li = async2.getFileRepresentationList();
                 JSONObject jo=FileUtils.createJSON(li);
-                FileUtils.saveJSONExternalStorageFromUri(uri2,jo,this);
+                FileUtils.saveJSONExternalStorageFromUri(uri,jo,getActivity().getApplicationContext());
 
             }
         }
@@ -156,43 +198,58 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         selected_files_counter.setText(Integer.toString(n));
     }
 
-    public void setRemainingItems(int n){
-        this.remainingItems = n;
-    }
 
-    public int getRemainingItems(int n){
-        return this.remainingItems;
-    }
-
-    public void decrementRemainingItems(int n){
-        this.remainingItems--;
+    @Override
+    public void notifyCompletion() {
+        setJsonExportButtonEnabled(true);
+        Log.d("test", "Completato!");
     }
 
     public void enableProgressBar(){
         this.progressBar.setVisibility(View.VISIBLE);
+        //circleProgressBar.setActivated(true);
     }
 
     public void disableProgressBar(){
         this.progressBar.setVisibility(View.GONE);
+        this.progressBar.setProgress(0);
+//        circleProgressBar.setActivated(true);
+//        circleProgressBar.setProgress(0);
+
+
     }
 
 
     @Override
     public void updateProgress(int progress) {
         progressBar.incrementProgressBy(progress);
+        //circleProgressBar.setProgress(progress);
 
     }
 
+    public void updateProgress() {
+        progressBar.incrementProgressBy(1);
+
+    }
+
+    public void setShowProgressBar(int works){
+        progressBar.setMax(works);
+    }
+
+
+
+
+
     public void testProgressbar(){
         new Thread(() ->{
-                for (int i=0; i<=100; i++) {
-                    progressBar.setProgress(i);
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            for (int i=0; i<=100; i++) {
+                progressBar.setProgress(i);
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            }).start();
+            }
+        }).start();
     }
 }

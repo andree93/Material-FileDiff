@@ -25,10 +25,10 @@
         android:text="@string/confronta_checksum"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.895"
+        app:layout_constraintHorizontal_bias="0.926"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.745" />
+        app:layout_constraintVertical_bias="0.829" />
 
     <TextView
         android:id="@+id/checksum_calculated_tv"
@@ -47,14 +47,16 @@
         android:id="@+id/checksum_match_tv"
         android:layout_width="400dp"
         android:layout_height="50dp"
+        android:textAlignment="textStart"
         android:textColor="#C51162"
-        android:textSize="20sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.158"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.62" />
+        app:layout_constraintVertical_bias="0.671" />
 
     <TextView
         android:id="@+id/file_selected_tv"
@@ -73,6 +75,7 @@
         android:id="@+id/file_name_tv"
         android:layout_width="310dp"
         android:layout_height="50dp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.137"
@@ -95,15 +98,19 @@
 
     <ImageButton
         android:id="@+id/file_pick_button"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        style="@style/Widget.AppCompat.ImageButton"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:adjustViewBounds="false"
+        android:background="#FFFFFF"
+        android:baselineAlignBottom="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintHorizontal_bias="0.391"
         app:layout_constraintStart_toEndOf="@+id/file_name_tv"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.127"
-        app:srcCompat="@drawable/folder" />
+        app:layout_constraintVertical_bias="0.107"
+        app:srcCompat="@drawable/file" />
 
     <ProgressBar
         android:id="@+id/progressbar"

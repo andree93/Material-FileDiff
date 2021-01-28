@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.provider.Contacts;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +19,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class Fragment1 extends Fragment implements View.OnClickListener, CommunicationInterfaceFrag1 {
+
+    Frag1ViewModel mViewModel;
 
     private static final int PICK_SINGLE_FILE = 1;
     CommunicationInterface com = null;
@@ -45,8 +51,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mViewModel = new ViewModelProvider(this).get(Frag1ViewModel.class);
 
         View view = inflater.inflate(R.layout.fragment1_layout, container, false);
+
 
         fu = new FragmentUtils();
 
@@ -64,17 +72,64 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         file_pick_button.setOnClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progressbar);
 
+        showFile_name_tv(mViewModel.getFile_name_tv());
+        showChecksum_calculated_tv(mViewModel.getChecksum_calculated_tv());
+        showChecksum_match_tv(mViewModel.getChecksum_match_tv());
+        checksum_match_tv_text_color(mViewModel.getChecksum_match_text_color());
+
+        if(mViewModel.getCalcola_checksum_button().equals("")){
+            Log.d("test", "string button vuota");
+            showCalcola_checksum_button(getString(R.string.calcola_checksum));
+        } else {
+            showCalcola_checksum_button(mViewModel.getCalcola_checksum_button());
+        }
+
+
         return view;
+
+    }
+
+    public void showFile_name_tv(String value){
+        file_name_tv.setText(value);
+        mViewModel.setFile_name_tv(value);
+    }
+
+    public void showChecksum_calculated_tv(String value){
+        checksum_calculated_tv.setText(value);
+        mViewModel.setChecksum_calculated_tv(value);
+    }
+
+    public void showChecksum_match_tv(String value){
+        checksum_match_tv.setText(value);
+        mViewModel.setChecksum_match_tv(value);
+    }
+
+    public void checksum_match_tv_text_color(int value){ //aaaa
+        checksum_match_tv.setTextColor(value);
+        mViewModel.setChecksum_match_text_color(value);
     }
 
 
+    public void showCalcola_checksum_button(String value){
+        calcola_checksum_button.setText(value);
+        mViewModel.setCalcola_checksum_button(value);
+    }
+
+    public void showChecksum_et(String value){
+        mViewModel.setChecksum_et(value);
+        checksum_et.setText(value);
+
+    }
+
+
+
     public void switch_calcola_checksum_button(){
-        calcola_checksum_button.setText(R.string.calcola_checksum);
+        showCalcola_checksum_button(getString(R.string.calcola_checksum));
     }
 
 
     public void switch_copia_checksum_button(){
-        calcola_checksum_button.setText(R.string.copia);
+        showCalcola_checksum_button(getString(R.string.copia));
     }
 
     public void copyToClipboard(){
@@ -93,7 +148,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.file_pick_button:
-                fu.pickFile(this);
+                fu.pickFile(this, false);
             break;
 
             case R.id.calcola_checksum_button: {
@@ -135,6 +190,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     }
 
     @Override
+    public void notifyCompletion() {
+        //
+    }
+
+    @Override
     public void sendResult(FileRepresentation fileRepresentation) {
         checksum_calculated_tv.setText(fileRepresentation.hash);
     }
@@ -164,9 +224,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
 
 
 
-    public void setChecksum_match_tv(String s){
-        checksum_match_tv.setText(s);
-    }
+
 
     public void setchecksum_et(String s){
         checksum_et.setText(s);
@@ -176,11 +234,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         String userChecksum = checksum_et.getText().toString();
         if(userChecksum != null){ //se l'input dell'utente non è vuoto
             if(userChecksum.equals(checksum_calculated_tv.getText())){
-                setChecksum_match_tv(getString(R.string.checksum_ok));
-                checksum_match_tv.setTextColor(Color.GREEN);
+                showChecksum_match_tv(getString(R.string.checksum_ok));
+                checksum_match_tv_text_color(Color.GREEN);
             } else{
-                setChecksum_match_tv(getString(R.string.checksum_ko));
-                checksum_match_tv.setTextColor(Color.RED);
+                showChecksum_match_tv(getString(R.string.checksum_ko));
+                checksum_match_tv_text_color(Color.RED);
             }
         }
     }
@@ -192,14 +250,14 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_SINGLE_FILE) {
             if (resultCode == RESULT_OK) {
-                setChecksum_match_tv("");
-                setchecksum_et("");
+                showChecksum_match_tv("");
+                showChecksum_match_tv("");
                 //startActivity(new Intent(Intent.ACTION_VIEW, data));
                 Uri fileUri = data.getData();
                 String fileName = FileUtils.UriToFileName(fileUri, getContext());
-                file_name_tv.setText(fileName); // imposto il nuovo nome del file visualizzato
+                showFile_name_tv(fileName); // imposto il nuovo nome del file visualizzato
                 switch_calcola_checksum_button(); //ripristino scritta pulsante a "calcola checksum" se è stato selezionato un nuovo file
-                checksum_calculated_tv.setText(""); //cancello checksum precedentemente calcolato
+                showChecksum_calculated_tv(""); //cancello checksum precedentemente calcolato
                 this.uri = fileUri;
             }
         }
@@ -208,10 +266,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putCharSequence("file_name_tv", file_name_tv.getText());
-        outState.putCharSequence("checksum_calculated_tv", checksum_calculated_tv.getText());
-        outState.putCharSequence("checksum_match_tv", checksum_match_tv.getText());
-        outState.putCharSequence("calcola_checksum_button", calcola_checksum_button.getText());
+        //outState.putCharSequence("file_name_tv", file_name_tv.getText());
+//        outState.putCharSequence("checksum_calculated_tv", checksum_calculated_tv.getText());
+//        outState.putCharSequence("checksum_match_tv", checksum_match_tv.getText());
+//        outState.putCharSequence("calcola_checksum_button", calcola_checksum_button.getText());
 
     }
 
@@ -220,16 +278,26 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(savedInstanceState != null){
-            file_name_tv.setText(String.valueOf(savedInstanceState.get("file_name_tv")));
-            checksum_calculated_tv.setText(String.valueOf(savedInstanceState.get("checksum_calculated_tv")));
-            checksum_match_tv.setText(String.valueOf(savedInstanceState.get("checksum_match_tv")));
-            calcola_checksum_button.setText(String.valueOf(savedInstanceState.get("calcola_checksum_button")));
+            //file_name_tv.setText(String.valueOf(savedInstanceState.get("file_name_tv")));
+//            checksum_calculated_tv.setText(String.valueOf(savedInstanceState.get("checksum_calculated_tv")));
+//            checksum_match_tv.setText(String.valueOf(savedInstanceState.get("checksum_match_tv")));
+//            calcola_checksum_button.setText(String.valueOf(savedInstanceState.get("calcola_checksum_button")));
 
         }
     }
 
+
+
+
+
+
     @Override
     public void updateProgress(int progress) {
+        //
+    }
+
+    @Override
+    public void updateProgress() {
         //
     }
 }

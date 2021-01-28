@@ -1,4 +1,6 @@
 package com.andrea.materialfilediff;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,7 +12,15 @@ public class FragmentUtils {
     private static final int SAVE_FILE_RESULT_CODE = 3;
 
 
-    public void pickFile(Fragment fr) {
+    public static void pickFile(Fragment fr, boolean allowMultiple){
+        if(allowMultiple)
+            pickFiles(fr);
+        else
+            FragmentUtils.pickFile(fr);
+    }
+
+
+    public static void pickFile(Fragment fr) {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -26,7 +36,7 @@ public class FragmentUtils {
     }
 
 
-    public void pickFiles(Fragment fr) {
+    public static void pickFiles(Fragment fr) {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -41,7 +51,7 @@ public class FragmentUtils {
 
     }
 
-    public void writeFile(Fragment fr){
+    public static void writeFile(Fragment fr){
         String fileName="exportedResults.json";
 
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);

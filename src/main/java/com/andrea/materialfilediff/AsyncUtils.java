@@ -105,10 +105,6 @@ public class AsyncUtils {
 
 
 
-
-
-
-
     public Observable<FileRepresentation> calcObservable2(Uri uri, Activity activity) {
         return Observable.defer(new Callable<ObservableSource<? extends FileRepresentation>>() {
             @Override
@@ -127,9 +123,10 @@ public class AsyncUtils {
         com.enableProgressBar();
 
         ArrayList<FileRepresentation> fileRepresentationList = new ArrayList<>();
-        ExecutorService executorService = Executors.newWorkStealingPool(8);
+        ExecutorService executorService = Executors.newWorkStealingPool(20);
         List<Callable<FileRepresentation>> mythreads = new ArrayList<>();
         List<Future<FileRepresentation>> futureList = new ArrayList<Future<FileRepresentation>>();
+
 
 
         for (Uri uri : uriList) {
@@ -160,4 +157,96 @@ public class AsyncUtils {
         Log.d("tag-test", "elementi lista: "+ fileRepresentationList.size());
         this.fileRepresentationList = fileRepresentationList;
     }
+
+
+    //
+
+
+
+
+
+    void calcolaChecksumRXJavaTEST(List<Uri> uri, Activity activity, CommunicationInterface com) {
+        com.enableProgressBar();
+
+        disposables.clear();
+
+        disposables.add(calcObservableTEST(uri, activity, com)
+                // Run on a background thread
+                .subscribeOn(Schedulers.newThread())
+                // Be notified on the main thread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<Boolean>() {
+                    @Override
+                    public void onComplete() {
+                        Log.d("Metodo onComplete", "Fine!!");
+                        com.disableProgressBar();
+                        com.notifyCompletion();
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+
+                    @Override
+                    public void onNext(Boolean value) {
+
+
+                    }
+                }));
+    }
+
+
+
+
+
+    public Observable<Boolean> calcObservableTEST(List<Uri> uri, Activity activity, CommunicationInterface com) {
+        return Observable.defer(new Callable<ObservableSource<? extends Boolean>>() {
+            @Override
+            public ObservableSource<? extends Boolean> call() {
+                // Do some long running operation
+
+
+                submitWork(uri, activity, com);
+                return Observable.defer(() -> Observable.just(true));
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
