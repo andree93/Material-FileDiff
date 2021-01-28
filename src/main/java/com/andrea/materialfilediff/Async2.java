@@ -39,7 +39,7 @@ public class Async2 {
     }
 
 
-    public Observable<FileRepresentation> calcObservableTEST(Uri uri, Context context) {
+    public Observable<FileRepresentation> calcObservable(Uri uri, Context context) {
         return Observable.defer(new Callable<ObservableSource<? extends FileRepresentation>>() {
             @Override
             public ObservableSource<? extends FileRepresentation> call() {
@@ -75,11 +75,11 @@ public class Async2 {
         disposables.clear();
         com.enableProgressBar();
 
-        Disposable[] bestemmie = new Disposable[nObservable];
+        Disposable[] disposableArr = new Disposable[nObservable];
         Log.d("addworks", "addWorks method (nObservable var): "+nObservable);
         Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());
         for (int i= 0; i<nObservable; i++){
-            Disposable diocane = calcObservableTEST(uriList.get(i), context)
+            Disposable disposable = calcObservable(uriList.get(i), context)
                     // Run on a background thread
                     .subscribeOn(Schedulers.single())
                     // Be notified on the main thread
@@ -119,10 +119,10 @@ public class Async2 {
                         }
                     });
 
-            bestemmie[i] = diocane;
+            disposableArr[i] = disposable;
 
         }
-        disposables.addAll(bestemmie);
+        disposables.addAll(disposableArr);
         Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());
 
     }
