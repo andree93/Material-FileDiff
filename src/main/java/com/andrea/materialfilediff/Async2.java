@@ -89,7 +89,7 @@ public class Async2 {
                         public void onComplete() {
                             if(remainings.decrementAndGet() == 0){
                                 Log.d("Metodo onComplete", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Metodo onComplete", "Fine porcoddio!!");
+                                Log.d("Metodo onComplete", "Fine !!");
                                 com.disableProgressBar();
                                 com.notifyCompletion();
                             }
@@ -101,7 +101,7 @@ public class Async2 {
                         public void onError(Throwable e) {
                             if(remainings.decrementAndGet() == 0){
                                 Log.d("Metodo onError", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Metodo onError", "Fine porcoddio!!");
+                                Log.d("Metodo onError", "Fine!!");
                                 com.disableProgressBar();
                                 com.notifyCompletion();
                             }
