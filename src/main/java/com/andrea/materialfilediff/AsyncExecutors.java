@@ -6,11 +6,14 @@ import android.util.Log;
 
 import java.util.concurrent.Callable;
 
+/** Classe NON in uso */
+
 public class AsyncExecutors implements Callable<FileRepresentation> {
 
     private final Uri uri;
     private final Activity activity;
 
+    @Deprecated
     public AsyncExecutors(Uri uri, Activity activity) {
         this.uri = uri;
         this.activity = activity;

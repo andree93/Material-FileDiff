@@ -48,7 +48,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         View view = inflater.inflate(R.layout.fragment2_layout, container, false);
         mViewModel = new ViewModelProvider(this).get(Frag2ViewModel.class);
 
-        uriList = new ArrayList<Uri>();
+
 
         files_pick_button = (ImageButton) view.findViewById(R.id.file_pick_button);
         selected_files_counter = (TextView) view.findViewById(R.id.selected_files_counter);
@@ -62,11 +62,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
         button_stop.setOnClickListener(this);
 
-
-
-
-
-
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         showProgressBar  = (Button) view.findViewById(R.id.showProgressBar);
         showProgressBar.setOnClickListener(this);
@@ -76,6 +71,9 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
         showSelected_files_counter_tv(mViewModel.getSelected_files_counter_tv());
         setJsonExportButtonEnabled(mViewModel.isJsonExportButton());
+
+        set_fileNames(mViewModel.getFileNameList());
+        set_uriList(mViewModel.getUriList());
 
 
 
@@ -97,6 +95,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
                 break;
             case R.id.calcola_checksum_button:{
                 if (uriList != null && uriList.size()>0){
+                    setJsonExportButtonEnabled(false);
                     setShowProgressBar(uriList.size());
                     async2.addWorks(uriList, getActivity().getApplicationContext(),this);
                 } else{
@@ -112,7 +111,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
             case R.id.button_stop:{
                 disableProgressBar();
                 setJsonExportButtonEnabled(false);
-                this.uriList = null;
+                set_uriList(null);
                 async2.dispose();
                 async2 = new Async2(); //Devo capire il motivo. Pur chiamando i metodi dispose() e clear(), la successiva aggiunta di nuovi lavori dà luogo a comportamenti anomali
             }
@@ -128,6 +127,21 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     public void sendTestData(String s) {
         //
     }
+
+    public void set_uriList(ArrayList<Uri> uriList){
+        this.uriList = uriList;
+        mViewModel.setUriList(uriList);
+    }
+
+
+    public void set_fileNames(ArrayList<String> fileNames){
+        this.fileNames = fileNames;
+        mViewModel.setFileNameList(fileNames);
+
+    }
+
+
+
 
     public void showSelected_files_counter_tv(int files){
         selected_files_counter.setText(Integer.toString(files));
@@ -145,17 +159,20 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICK_MULTIPLE_FILES_RESULT_CODE) {
             if (data != null) { // checking empty selection
-                uriList = FileUtils.clipDataToUriList(data);
-                fileNames = FileUtils.uriListToFileNameList(uriList, getContext());
-                showSelected_files_counter_tv(uriList.size());
+                setJsonExportButtonEnabled(false); //selezionati nuovi file da elaborare. Disattivo il pulsante per esportare i risultati
+                set_uriList((ArrayList<Uri>) FileUtils.clipDataToUriList(data));
+                //fileNames = FileUtils.uriListToFileNameList(uriList, getContext());
+                set_fileNames((ArrayList<String>) FileUtils.uriListToFileNameList(uriList, getContext())); //ricavo la lista dei nomi dei file selezionati a partire dagli URI
+                showSelected_files_counter_tv(uriList.size()); //Aggiorno il contatore che mostra il numero di file selezionati
+
             }
         } else if(requestCode == SAVE_FILE_RESULT_CODE){
 
             if ( data != null){
                 Uri uri = data.getData();
                 ArrayList<FileRepresentation> li = async2.getFileRepresentationList();
-                JSONObject jo=FileUtils.createJSON(li);
-                FileUtils.saveJSONExternalStorageFromUri(uri,jo,getActivity().getApplicationContext());
+                JSONObject jo=FileUtils.createJSON(li); //Creo un JSONObject a partire dai risultati appena ottenuti
+                FileUtils.saveJSONExternalStorageFromUri(uri,jo,getActivity().getApplicationContext()); //salvo i risultati in un file JSON
 
             }
         }
@@ -163,10 +180,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
 
     }
-
-
-
-
 
 
     /**
@@ -201,7 +214,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
     @Override
     public void notifyCompletion() {
-        setJsonExportButtonEnabled(true);
+        setJsonExportButtonEnabled(true); // abilito il pulsante per esportare i risultati in JSON dopo il completamento delle elaborazioni
         Log.d("test", "Completato!");
     }
 
@@ -210,6 +223,10 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         //circleProgressBar.setActivated(true);
     }
 
+
+    /**
+     * Metodo per resettare il progresso della ProgressBar e disattivarla
+     */
     public void disableProgressBar(){
         this.progressBar.setVisibility(View.GONE);
         this.progressBar.setProgress(0);
@@ -227,11 +244,16 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
     }
 
+
     public void updateProgress() {
         progressBar.incrementProgressBy(1);
 
     }
 
+    /**
+     * metodo per impostare il numero totale dei lavori. necessario per la progressBar
+     * @param works numero totale dei lavori
+     */
     public void setShowProgressBar(int works){
         progressBar.setMax(works);
     }

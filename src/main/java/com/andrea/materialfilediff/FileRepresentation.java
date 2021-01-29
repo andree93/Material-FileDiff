@@ -1,5 +1,10 @@
 package com.andrea.materialfilediff;
 
+/** POJO Class
+ * Rappresenta le proprietà di un file di interesse a questa applicazione
+ *
+ *
+ */
 public class FileRepresentation {
     public String nome;
     public String hash;

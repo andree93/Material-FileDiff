@@ -44,13 +44,11 @@ public class Async2 {
             @Override
             public ObservableSource<? extends FileRepresentation> call() {
 
-                FileUtils fu = new FileUtils();
-
                 FileRepresentation fileRepresentation = FileUtils.calcolaChecksumFromUri(uri, context);
 
-                Log.d("test-0X", fileRepresentation.nome);
-                Log.d("test-0X", fileRepresentation.hash);
-                Log.d("Thread name: ", Thread.currentThread().getName());
+                Log.d("test-0X", fileRepresentation.nome); // test
+                Log.d("test-0X", fileRepresentation.hash); // test
+                Log.d("Thread name: ", Thread.currentThread().getName()); // test
 
 
                 FileRepresentation finalFileRepresentation = fileRepresentation;
@@ -69,15 +67,15 @@ public class Async2 {
 
         fileRepresentationList.clear();
 
-        int nObservable = uriList.size();
-        AtomicInteger remainings = new AtomicInteger(nObservable);
+        int nObservable = uriList.size(); //numero observable
+        AtomicInteger remainings = new AtomicInteger(nObservable); //mi serve per tenere traccia del numero di lavori rimanenti
 
         disposables.clear();
         com.enableProgressBar();
 
         Disposable[] disposableArr = new Disposable[nObservable];
-        Log.d("addworks", "addWorks method (nObservable var): "+nObservable);
-        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());
+        Log.d("addworks", "addWorks method (nObservable var): "+nObservable); // test
+        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size()); // test
         for (int i= 0; i<nObservable; i++){
             Disposable disposable = calcObservable(uriList.get(i), context)
                     // Run on a background thread
@@ -88,8 +86,8 @@ public class Async2 {
                         @Override
                         public void onComplete() {
                             if(remainings.decrementAndGet() == 0){
-                                Log.d("Metodo onComplete", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Metodo onComplete", "Fine !!");
+                                Log.d("Method onComplete called", "elementi lista: "+fileRepresentationList.size()); // test
+                                Log.d("Method onComplete called", "End!!"); // test
                                 com.disableProgressBar();
                                 com.notifyCompletion();
                             }
@@ -100,15 +98,15 @@ public class Async2 {
                         @Override
                         public void onError(Throwable e) {
                             if(remainings.decrementAndGet() == 0){
-                                Log.d("Metodo onError", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Metodo onError", "Fine!!");
+                                Log.d("Method onError", "elementi lista: "+fileRepresentationList.size()); // test
+                                Log.d("Method onError", "End!!"); // test
                                 com.disableProgressBar();
                                 com.notifyCompletion();
                             }
 
                             com.updateProgress();
 
-                            Log.d("Metodo onError", "metodo onError chiamato");
+                            Log.d("method onError", "method onError called"); // test
 
                         }
 
@@ -123,11 +121,8 @@ public class Async2 {
 
         }
         disposables.addAll(disposableArr);
-        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());
+        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());  // test
 
     }
-
-    //
-
 
 }

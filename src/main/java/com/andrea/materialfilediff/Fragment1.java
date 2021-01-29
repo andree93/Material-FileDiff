@@ -30,9 +30,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     Frag1ViewModel mViewModel;
 
     private static final int PICK_SINGLE_FILE = 1;
-    CommunicationInterface com = null;
-    FragmentUtils fu = null;
-    ParcelFileDescriptor pfd = null;
     Button confronta_checksum_button;
     Button calcola_checksum_button;
     ImageButton file_pick_button;
@@ -55,9 +52,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
 
         View view = inflater.inflate(R.layout.fragment1_layout, container, false);
 
-
-        fu = new FragmentUtils();
-
         confronta_checksum_button = (Button) view.findViewById(R.id.jsonExportButton);
         calcola_checksum_button = (Button) view.findViewById(R.id.calcola_checksum_button);
         file_pick_button = (ImageButton) view.findViewById(R.id.file_pick_button);
@@ -78,7 +72,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         checksum_match_tv_text_color(mViewModel.getChecksum_match_text_color());
 
         if(mViewModel.getCalcola_checksum_button().equals("")){
-            Log.d("test", "string button vuota");
+            Log.d("test", "string button vuota"); //TEST
             showCalcola_checksum_button(getString(R.string.calcola_checksum));
         } else {
             showCalcola_checksum_button(mViewModel.getCalcola_checksum_button());
@@ -132,6 +126,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         showCalcola_checksum_button(getString(R.string.copia));
     }
 
+
+    /**
+     * Metodo per la copia del testo negli appunti di Android
+     */
     public void copyToClipboard(){
         myClipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
         String text;
@@ -148,12 +146,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.file_pick_button:
-                fu.pickFile(this, false);
+                FragmentUtils.pickFile(this, false);
             break;
 
             case R.id.calcola_checksum_button: {
-                //calcolaChecksumThread();
-                //calcolaChecksumRXJava();
                 if(getCalcola_checksum_button().equalsIgnoreCase(getString(R.string.calcola_checksum))){
                     AsyncUtils at = new AsyncUtils();
                     at.calcolaChecksumRXJava2(uri, getActivity(), this);
@@ -266,6 +262,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        /**
+         * Utilizzo il view Model al posto dei metodi onSaveInstanceState e OnActivityCreated
+         */
         //outState.putCharSequence("file_name_tv", file_name_tv.getText());
 //        outState.putCharSequence("checksum_calculated_tv", checksum_calculated_tv.getText());
 //        outState.putCharSequence("checksum_match_tv", checksum_match_tv.getText());
@@ -278,6 +277,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(savedInstanceState != null){
+            /**
+             * Utilizzo il view Model al posto dei metodi onSaveInstanceState e OnActivityCreated
+             */
             //file_name_tv.setText(String.valueOf(savedInstanceState.get("file_name_tv")));
 //            checksum_calculated_tv.setText(String.valueOf(savedInstanceState.get("checksum_calculated_tv")));
 //            checksum_match_tv.setText(String.valueOf(savedInstanceState.get("checksum_match_tv")));

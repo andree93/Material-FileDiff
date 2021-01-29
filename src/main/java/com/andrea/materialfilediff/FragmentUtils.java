@@ -12,6 +12,11 @@ public class FragmentUtils {
     private static final int SAVE_FILE_RESULT_CODE = 3;
 
 
+    /**
+     *
+     * @param fr riferimento al Fragment
+     * @param allowMultiple booleano, se TRUE, sarà possibile selezionare più file tramite Android storage framework, altrimenti uno solo
+     */
     public static void pickFile(Fragment fr, boolean allowMultiple){
         if(allowMultiple)
             pickFiles(fr);
@@ -20,6 +25,10 @@ public class FragmentUtils {
     }
 
 
+    /**
+     * metodo per selezionare un file tramite android storage framework
+     * @param fr riferimento al fragment
+     */
     public static void pickFile(Fragment fr) {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -36,6 +45,10 @@ public class FragmentUtils {
     }
 
 
+    /**
+     * metodo per selezionare più file tramite android storage framework
+     * @param fr  riferimento al fragment
+     */
     public static void pickFiles(Fragment fr) {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);

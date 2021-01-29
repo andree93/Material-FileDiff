@@ -157,7 +157,7 @@ public class AsyncUtils {
         Log.d("tag-test", "elementi lista: "+ fileRepresentationList.size());
         this.fileRepresentationList = fileRepresentationList;
     }
-    
+
 }
 
 

@@ -6,12 +6,14 @@ import android.util.Log;
 import java.util.concurrent.*;
 
 public class AsyncThread implements Runnable{
+    /** Classe NON utilizzata */
     private FileRepresentation fileRepresentation;
     private Uri uri;
     private Activity activity;
     CommunicationInterface com;
 
 
+    @Deprecated
     public AsyncThread(Uri uri, Activity activity, CommunicationInterface com) {
         this.uri = uri;
         this.activity = activity;
