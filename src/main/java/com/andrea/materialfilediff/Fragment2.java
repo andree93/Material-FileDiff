@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONObject;
@@ -36,7 +35,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     //CircleProgressBar circleProgressBar = null;
     List<Uri> uriList = null;
     List<String> fileNames = null;
-    Async2 async2 = new Async2();
+    AsyncCallRXJava2 asyncCallRXJava2 = new AsyncCallRXJava2();
 
 
 
@@ -57,14 +56,10 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
         button_stop = (Button) view.findViewById(R.id.button_stop);
 
-
-        //circleProgressBar = view.findViewById(R.id.line_progress);
-
         button_stop.setOnClickListener(this);
 
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        showProgressBar  = (Button) view.findViewById(R.id.showProgressBar);
-        showProgressBar.setOnClickListener(this);
+        //showProgressBar  = (Button) view.findViewById(R.id.showProgressBar);
         files_pick_button.setOnClickListener(this);
         calcola_checksum_button.setOnClickListener(this);
         jsonExportButton.setOnClickListener(this);
@@ -74,6 +69,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
         set_fileNames(mViewModel.getFileNameList());
         set_uriList(mViewModel.getUriList());
+        setCancelButtonEnabled(mViewModel.getCancelButtonStatus());
 
 
 
@@ -89,15 +85,16 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
             case R.id.file_pick_button:
                 FragmentUtils.pickFile(this, true);
                 break;
-            case R.id.showProgressBar:
+            /**case R.id.showProgressBar:
                 this.enableProgressBar();
                 this.testProgressbar();
-                break;
+                break; */
             case R.id.calcola_checksum_button:{
                 if (uriList != null && uriList.size()>0){
                     setJsonExportButtonEnabled(false);
+                    setCancelButtonEnabled(View.VISIBLE);
                     setShowProgressBar(uriList.size());
-                    async2.addWorks(uriList, getActivity().getApplicationContext(),this);
+                    asyncCallRXJava2.addWorks(uriList, getActivity().getApplicationContext(),this);
                 } else{
                     Log.d("Errore", "Lista URI Vuota");
                 }
@@ -110,10 +107,11 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
             case R.id.button_stop:{
                 disableProgressBar();
+                setCancelButtonEnabled(View.GONE);
                 setJsonExportButtonEnabled(false);
                 set_uriList(null);
-                async2.dispose();
-                async2 = new Async2(); //Devo capire il motivo. Pur chiamando i metodi dispose() e clear(), la successiva aggiunta di nuovi lavori dà luogo a comportamenti anomali
+                asyncCallRXJava2.dispose();
+                asyncCallRXJava2 = new AsyncCallRXJava2(); //Devo capire il motivo. Pur chiamando i metodi dispose() e clear(), la successiva aggiunta di nuovi lavori dà luogo a comportamenti anomali
             }
             break;
 
@@ -155,6 +153,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
 
 
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICK_MULTIPLE_FILES_RESULT_CODE) {
@@ -170,7 +169,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
             if ( data != null){
                 Uri uri = data.getData();
-                ArrayList<FileRepresentation> li = async2.getFileRepresentationList();
+                ArrayList<FileRepresentation> li = asyncCallRXJava2.getFileRepresentationList();
                 JSONObject jo=FileUtils.createJSON(li); //Creo un JSONObject a partire dai risultati appena ottenuti
                 FileUtils.saveJSONExternalStorageFromUri(uri,jo,getActivity().getApplicationContext()); //salvo i risultati in un file JSON
 
@@ -209,12 +208,22 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
     public void setSelected_files_counter(int n){
         selected_files_counter.setText(Integer.toString(n));
+        mViewModel.setSelected_files_counter_tv(n);
+    }
+
+
+
+    public void setCancelButtonEnabled(int status){
+        button_stop.setVisibility(status);
+        mViewModel.setcancelButtonStatus(status);
     }
 
 
     @Override
     public void notifyCompletion() {
+        setCancelButtonEnabled(View.GONE);
         setJsonExportButtonEnabled(true); // abilito il pulsante per esportare i risultati in JSON dopo il completamento delle elaborazioni
+        //Toast.makeText(this.getActivity(), "Hash calcolato", Toast.LENGTH_SHORT).show();
         Log.d("test", "Completato!");
     }
 
@@ -262,6 +271,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
 
 
+    /** Test progressBar
     public void testProgressbar(){
         new Thread(() ->{
             for (int i=0; i<=100; i++) {
@@ -273,5 +283,5 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
                 }
             }
         }).start();
-    }
+    } */
 }

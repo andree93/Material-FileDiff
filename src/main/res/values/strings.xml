@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">FileDIFF</string>
+    <string name="app_name">Material FileDIFF</string>
+    <string name="tab_text_1">File singolo</string>
+    <string name="tab_text_2">Batch Files</string>
+    <string name="tab_text_3">Confronta</string>
+    <string name="calcola_checksum">Calcola checksum</string>
+    <string name="copia">Copia checksum</string>
+    <string name="checksum_ok">Il checksum coincide</string>
+    <string name="checksum_ko">Il checksum non coincide</string>
+    <string name="confronta_checksum">Confronta checksum</string>
+    <string name="checksum_calcolato">Checksum calcolato</string>
+    <string name="file_selezionato">File selezionato:</string>
+    <string name="file_selezionati">File selezionati:</string>
+    <string name="inserisci_o_incolla_checksum">Inserisci o incolla checksum...</string>
+    <string name="vuoto">vuoto</string>
+    <string name="seleziona_file">Seleziona File...</string>
+    <string name="risultato">Risultato:</string>
 </resources>

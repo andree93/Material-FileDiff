@@ -1,16 +1,38 @@
 package com.andrea.materialfilediff;
 
+import android.view.View;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.SavedStateHandle;
 
 public class Frag1ViewModel extends ViewModel {
     private SavedStateHandle state;
-    String file_name_tv="";
+    String file_name_tv="Seleziona File...";
     String checksum_calculated_tv="";
     String checksum_match_tv="";
     String calcola_checksum_button="";
     String checksum_et="";
     int checksum_match_text_color;
+    int isProgressBarEnabled = View.GONE;
+    boolean isCompareChecksumButtonEnabled=false;
+
+
+    public void setIsCompareChecksumButtonEnabled(boolean enabled) {
+        this.isCompareChecksumButtonEnabled = enabled;
+    }
+
+    public boolean getIsCompareChecksumButtonEnabled() {
+        return this.isCompareChecksumButtonEnabled;
+    }
+
+
+    public void setProgressBarEnabled(int enabled) {
+        this.isProgressBarEnabled = enabled;
+    }
+
+    public int getProgressBarEnabled() {
+        return this.isProgressBarEnabled;
+    }
 
 
     public int getChecksum_match_text_color() {

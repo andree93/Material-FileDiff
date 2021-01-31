@@ -1,6 +1,7 @@
 package com.andrea.materialfilediff;
 
 import android.net.Uri;
+import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -17,10 +18,22 @@ public class Frag2ViewModel extends ViewModel {
 
     int selected_files_counter=0;
     boolean jsonExportButton=false;
+    int cancelButtonEnabled= View.GONE;
 
 
     private MutableLiveData<ArrayList<String>> fileNameList;
     private MutableLiveData<ArrayList<Uri>> uriList;
+
+
+
+    public int getCancelButtonStatus() {
+        return cancelButtonEnabled;
+    }
+
+    public void setcancelButtonStatus(int status) {
+        this.cancelButtonEnabled = status;
+    }
+
 
 
 
