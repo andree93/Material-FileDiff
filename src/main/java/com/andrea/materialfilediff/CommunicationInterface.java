@@ -7,5 +7,6 @@ public interface CommunicationInterface {
     void disableProgressBar();
     void sendTestData(String s);
     void notifyCompletion();
+    void notifyError();
 
 }

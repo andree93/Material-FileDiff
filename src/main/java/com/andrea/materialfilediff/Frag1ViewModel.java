@@ -13,7 +13,7 @@ public class Frag1ViewModel extends ViewModel {
     String calcola_checksum_button="";
     String checksum_et="";
     int checksum_match_text_color;
-    int isProgressBarEnabled = View.GONE;
+    int progressBarVisibility = View.GONE;
     boolean isCompareChecksumButtonEnabled=false;
 
 
@@ -26,12 +26,12 @@ public class Frag1ViewModel extends ViewModel {
     }
 
 
-    public void setProgressBarEnabled(int enabled) {
-        this.isProgressBarEnabled = enabled;
+    public void setProgressBarVisibility(int visibility) {
+        this.progressBarVisibility = visibility;
     }
 
-    public int getProgressBarEnabled() {
-        return this.isProgressBarEnabled;
+    public int getProgressBarVisibility() {
+        return this.progressBarVisibility;
     }
 
 

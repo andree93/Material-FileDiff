@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -80,7 +81,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
         showChecksum_calculated_tv(mViewModel.getChecksum_calculated_tv());
         showChecksum_match_tv(mViewModel.getChecksum_match_tv());
         checksum_match_tv_text_color(mViewModel.getChecksum_match_text_color());
-        enableProgressBar(mViewModel.getProgressBarEnabled());
+        enableProgressBar(mViewModel.getProgressBarVisibility());
         setCompare_checksum_button_status(mViewModel.getIsCompareChecksumButtonEnabled());
 
 
@@ -199,7 +200,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     }
 
     public void enableProgressBar(int visible) {
-        mViewModel.setProgressBarEnabled(visible);
+        mViewModel.setProgressBarVisibility(visible);
         progressBar.setVisibility(visible);
     }
 
@@ -207,14 +208,14 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
 
     @Override
     public void enableProgressBar() {
-        mViewModel.setProgressBarEnabled(View.VISIBLE);
+        mViewModel.setProgressBarVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
 
     }
 
     @Override
     public void disableProgressBar() {
-        mViewModel.setProgressBarEnabled(View.GONE);
+        mViewModel.setProgressBarVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
     }
 
@@ -225,13 +226,18 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
 
     @Override
     public void notifyCompletion() {
-        //
-
         showChecksum_calculated_tv(asyncCallRXJava2.getFileRepresentationList().get(0).hash);
         showFile_name_tv(asyncCallRXJava2.getFileRepresentationList().get(0).nome);
         switch_copia_checksum_button();
         setCompare_checksum_button_status(true);
-        //Toast.makeText(this.getActivity(), "Hash calcolato", Toast.LENGTH_SHORT).show();
+        disableProgressBar();
+        Toast.makeText(this.getActivity(), "Hash calcolato", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void notifyError() {
+        disableProgressBar();
+        Toast.makeText(this.getActivity(), "Errore, hash non calcolato!!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -242,6 +248,8 @@ public class Fragment1 extends Fragment implements View.OnClickListener, Communi
     public String getCalcola_checksum_button(){
         return calcola_checksum_button.getText().toString();
     }
+
+
 
 /** Simple thread java version
     private void calcolaChecksumThread() {

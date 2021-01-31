@@ -166,21 +166,18 @@ public class AsyncCallRXJava2 {
                             public void onComplete() {
                                 Log.d("Method onComplete called", "elementi lista: "+fileRepresentationList.size());
                                 Log.d("Method onComplete called", "End!!");
-                                com.disableProgressBar();
-                                com.notifyCompletion();
                                 com.updateProgress();
-                                Log.d("Method onComplete called", "End!!");
+                                com.notifyCompletion();
+                                Log.d("onComplete", "Method onComplete called End!!");
 
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.d("Method onError", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Method onError", "End!!");
-                                com.disableProgressBar();
-                                com.notifyCompletion();
+                                //Log.d("Method onError", "elementi lista: "+fileRepresentationList.size());
 
                                 Log.d("method onError", "method onError called");
+                                com.notifyError();
 
                             }
 

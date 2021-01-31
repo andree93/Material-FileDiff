@@ -19,11 +19,20 @@ public class Frag2ViewModel extends ViewModel {
     int selected_files_counter=0;
     boolean jsonExportButton=false;
     int cancelButtonEnabled= View.GONE;
+    int progressBarVisibility = View.GONE;
 
 
     private MutableLiveData<ArrayList<String>> fileNameList;
     private MutableLiveData<ArrayList<Uri>> uriList;
 
+
+    public void setProgressBarVisibility(int visibility) {
+        this.progressBarVisibility = visibility;
+    }
+
+    public int getProgressBarVisibility() {
+        return this.progressBarVisibility;
+    }
 
 
     public int getCancelButtonStatus() {

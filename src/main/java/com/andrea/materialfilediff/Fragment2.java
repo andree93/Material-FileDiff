@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +29,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     ImageButton files_pick_button = null;
     TextView selected_files_counter = null;
     Button calcola_checksum_button = null;
-    Button showProgressBar = null;
+    //Button showProgressBar = null;
     Button jsonExportButton = null;
     Button button_stop = null;
     ProgressBar progressBar = null;
@@ -59,6 +60,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         button_stop.setOnClickListener(this);
 
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
         //showProgressBar  = (Button) view.findViewById(R.id.showProgressBar);
         files_pick_button.setOnClickListener(this);
         calcola_checksum_button.setOnClickListener(this);
@@ -70,6 +72,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         set_fileNames(mViewModel.getFileNameList());
         set_uriList(mViewModel.getUriList());
         setCancelButtonEnabled(mViewModel.getCancelButtonStatus());
+        setProgressBarVisibility(mViewModel.getProgressBarVisibility());
 
 
 
@@ -160,7 +163,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
             if (data != null) { // checking empty selection
                 setJsonExportButtonEnabled(false); //selezionati nuovi file da elaborare. Disattivo il pulsante per esportare i risultati
                 set_uriList((ArrayList<Uri>) FileUtils.clipDataToUriList(data));
-                //fileNames = FileUtils.uriListToFileNameList(uriList, getContext());
                 set_fileNames((ArrayList<String>) FileUtils.uriListToFileNameList(uriList, getContext())); //ricavo la lista dei nomi dei file selezionati a partire dagli URI
                 showSelected_files_counter_tv(uriList.size()); //Aggiorno il contatore che mostra il numero di file selezionati
 
@@ -223,13 +225,25 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     public void notifyCompletion() {
         setCancelButtonEnabled(View.GONE);
         setJsonExportButtonEnabled(true); // abilito il pulsante per esportare i risultati in JSON dopo il completamento delle elaborazioni
-        //Toast.makeText(this.getActivity(), "Hash calcolato", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.getActivity(), "Hash calcolato: "+ asyncCallRXJava2.getFileRepresentationList().size() + "/" + uriList.size()+ " File!", Toast.LENGTH_SHORT).show();
+        disableProgressBar();
         Log.d("test", "Completato!");
     }
 
+    @Override
+    public void notifyError() {
+        disableProgressBar();
+    }
+
     public void enableProgressBar(){
-        this.progressBar.setVisibility(View.VISIBLE);
+        mViewModel.setProgressBarVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
         //circleProgressBar.setActivated(true);
+    }
+
+    public void setProgressBarVisibility(int visible) {
+        mViewModel.setProgressBarVisibility(visible);
+        progressBar.setVisibility(visible);
     }
 
 
@@ -237,8 +251,9 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
      * Metodo per resettare il progresso della ProgressBar e disattivarla
      */
     public void disableProgressBar(){
-        this.progressBar.setVisibility(View.GONE);
-        this.progressBar.setProgress(0);
+        mViewModel.setProgressBarVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+        progressBar.setProgress(0);
 //        circleProgressBar.setActivated(true);
 //        circleProgressBar.setProgress(0);
 
