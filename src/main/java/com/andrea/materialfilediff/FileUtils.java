@@ -75,10 +75,19 @@ public class FileUtils {
      * @return FileRepresentation - Rappresentazione delle proprietà principali di un file
      */
 
+    /** IMPORTANTE: Modificare il metodo in modo da gestire un'eventuale eccezione del metodo  getFileDescriptorFromUri
+     * e restituire un FileRepresentation con valori sentinella (o nulli) anzichè propagare l'eccezione
+     * al metodo chiamante, che causerebbe l'invocazione del metodo onError in RXJava2.
+     * Sarà possibile ottenere l'elenco dei file mancanti confrontando la lista di Uri (o nomi dei file)
+     * con quella ottenuta dopo il calcolo dell'hash dei file.
+     * Nel metodo onNext, si potrebbe controllare se le proprietà dell'oggetto FileRepresentation contengono valori nulli
+     * e nel caso, non aggiungerlo alla lista**/
     public static FileRepresentation calcolaChecksumFromUri(Uri uri, Context context ) {
         ParcelFileDescriptor pfd = null;
-        pfd = getFileDescriptorFromUri(uri, context);
         String filename =  UriToFileName(uri, context);
+        Log.d("test2", "nomefile: "+ filename);
+
+        pfd = getFileDescriptorFromUri(uri, context);
         String hash=null;
         try(FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd)){
             hash = new String(Hex.encodeHex(DigestUtils.md5(fis)));
@@ -89,6 +98,7 @@ public class FileUtils {
             Log.d("test IO", "ccc!");
             //Log.d("test IO", "ECCEZIONE!");
         }
+        Log.d("test", "calcolaChecksumFromUri return");
         return new FileRepresentation(filename, hash);
     }
 

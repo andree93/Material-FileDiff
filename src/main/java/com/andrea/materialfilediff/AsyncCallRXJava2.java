@@ -41,9 +41,7 @@ public class AsyncCallRXJava2 {
 
     public void dispose(){
         disposables.dispose();
-
     }
-
 
     public Observable<FileRepresentation> calcObservable(Uri uri, Context context) {
         return Observable.defer(new Callable<ObservableSource<? extends FileRepresentation>>() {
@@ -51,9 +49,6 @@ public class AsyncCallRXJava2 {
             public ObservableSource<? extends FileRepresentation> call() {
 
                 FileRepresentation fileRepresentation = FileUtils.calcolaChecksumFromUri(uri, context);
-
-                Log.d("test-0X", fileRepresentation.nome); // test
-                Log.d("test-0X", fileRepresentation.hash); // test
                 Log.d("Thread name: ", Thread.currentThread().getName()); // test
 
 
@@ -63,87 +58,6 @@ public class AsyncCallRXJava2 {
             }
         });
     }
-
-
-
-    //
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void addWorks(List<Uri> uriList, Context context, CommunicationInterface com){
-
-        fileRepresentationList.clear();
-
-        int nObservable = uriList.size(); //numero observable
-        AtomicInteger remainings = new AtomicInteger(nObservable); //mi serve per tenere traccia del numero di lavori rimanenti
-
-        disposables.clear();
-        com.enableProgressBar();
-
-        Disposable[] disposableArr = new Disposable[nObservable];
-        Log.d("addworks", "addWorks method (nObservable var): "+nObservable); // test
-        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size()); // test
-        for (int i= 0; i<nObservable; i++){
-            Disposable disposable = calcObservable(uriList.get(i), context)
-                    // Run on a background thread
-                    .subscribeOn(Schedulers.single())
-                    // Be notified on the main thread
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<FileRepresentation>() {
-                        @Override
-                        public void onComplete() {
-                            if(remainings.decrementAndGet() == 0){
-                                Log.d("Method onComplete called", "elementi lista: "+fileRepresentationList.size()); // test
-                                Log.d("Method onComplete called", "End!!"); // test
-                                com.disableProgressBar();
-                                com.notifyCompletion();
-                            }
-                            com.updateProgress();
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            if(remainings.decrementAndGet() == 0){
-                                Log.d("Method onError", "elementi lista: "+fileRepresentationList.size()); // test
-                                Log.d("Method onError", "End!!"); // test
-                                com.disableProgressBar();
-                                com.notifyCompletion();
-                            }
-
-                            com.updateProgress();
-
-                            Log.d("method onError", "method onError called"); // test
-
-                        }
-
-                        @Override
-                        public void onNext(FileRepresentation value) {
-
-                            fileRepresentationList.add(value);
-                        }
-                    });
-
-            disposableArr[i] = disposable;
-
-        }
-        disposables.addAll(disposableArr);
-        Log.d("addworks", "addWorks method (disposable.size() ): "+disposables.size());  // test
-
-    }
-
-
-    // test 3
 
 
     public void addWorks3(List<Uri> uriList, Context context, CommunicationInterface com) {
@@ -163,46 +77,30 @@ public class AsyncCallRXJava2 {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableObserver<FileRepresentation>() {
                             @Override
-                            public void onComplete() {
-                                Log.d("Method onComplete called", "elementi lista: "+fileRepresentationList.size());
-                                Log.d("Method onComplete called", "End!!");
+                            public void onComplete() { //metodo chiamato SE tutti gli Observable sono eseguiti con successo
+                                //Log.d("Method onComplete called", "elementi lista: "+fileRepresentationList.size());
                                 com.updateProgress();
                                 com.notifyCompletion();
-                                Log.d("onComplete", "Method onComplete called End!!");
-
+                                Log.d("onComplete", " method onComplete called End!!");
                             }
 
                             @Override
-                            public void onError(Throwable e) {
+                            public void onError(Throwable e) { // metodo chiamato una sola volta, appena si verifica un'eccezione
                                 //Log.d("Method onError", "elementi lista: "+fileRepresentationList.size());
-
-                                Log.d("method onError", "method onError called");
+                                Log.d("method onError", " method onError called"+e);
+                                fileRepresentationList.clear();
                                 com.notifyError();
-
                             }
 
                             @Override
-                            public void onNext(FileRepresentation value) {
+                            public void onNext(FileRepresentation value) { //metodo chiamato per ogni valore  emesso dall'observable (se non vengono sollevate eccezioni)
 
+                                Log.d("onNext", " method onNext called");
                                 fileRepresentationList.add(value);
 
                                 com.updateProgress();
                             }
                         })
         );
-
-
-
     }
-
-
-
-
-
-
-
-//
-
-
-
 }

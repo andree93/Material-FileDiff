@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Fragment2 extends Fragment  implements View.OnClickListener, CommunicationInterface {
@@ -37,6 +38,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     List<Uri> uriList = null;
     List<String> fileNames = null;
     AsyncCallRXJava2 asyncCallRXJava2 = new AsyncCallRXJava2();
+    HashSet<FileRepresentation> fileRepresentationHashSet = null;
 
 
 
@@ -97,7 +99,7 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
                     setJsonExportButtonEnabled(false);
                     setCancelButtonEnabled(View.VISIBLE);
                     setShowProgressBar(uriList.size());
-                    asyncCallRXJava2.addWorks(uriList, getActivity().getApplicationContext(),this);
+                    asyncCallRXJava2.addWorks3(uriList, getActivity().getApplicationContext(),this);
                 } else{
                     Log.d("Errore", "Lista URI Vuota");
                 }
@@ -227,12 +229,16 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         setJsonExportButtonEnabled(true); // abilito il pulsante per esportare i risultati in JSON dopo il completamento delle elaborazioni
         Toast.makeText(this.getActivity(), "Hash calcolato: "+ asyncCallRXJava2.getFileRepresentationList().size() + "/" + uriList.size()+ " File!", Toast.LENGTH_SHORT).show();
         disableProgressBar();
+        setCancelButtonEnabled(getView().GONE);
         Log.d("test", "Completato!");
     }
 
     @Override
     public void notifyError() {
         disableProgressBar();
+        updateProgress(0);
+        setCancelButtonEnabled(getView().GONE);
+        Toast.makeText(this.getActivity(), "Si son verificati degli errori, riprova!!", Toast.LENGTH_SHORT).show();
     }
 
     public void enableProgressBar(){
