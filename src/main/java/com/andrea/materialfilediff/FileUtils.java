@@ -11,25 +11,90 @@ import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 
+import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class FileUtils {
+
+    public static HashMap<String,FileRepresentation> jsonObjectParser(Uri uri, Context context){
+        HashMap<String, FileRepresentation> fileRepresentationHashMap = new HashMap<>();
+        String filecontent="";
+
+        ParcelFileDescriptor pfd = null;
+        String filename =  UriToFileName(uri, context);
+        Log.d("test2", "nomefile: "+ filename);
+
+        pfd = getFileDescriptorFromUri(uri, context);
+        try(FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd)){
+
+            filecontent= IOUtils.toString(fis, "UTF-8");
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        JSONObject obj= null;
+        try {
+             obj = new JSONObject(filecontent);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONArray jsonarr = null;
+
+        try {
+            jsonarr = obj.getJSONArray("filelist");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i<jsonarr.length(); i++){
+            JSONObject tmpjsobj=null;
+            try {
+                tmpjsobj = jsonarr.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String tmpNomeFile = "";
+            String tmpHashFile = "";
+
+            try {
+                tmpNomeFile = tmpjsobj.getString("nome");
+                tmpHashFile = tmpjsobj.getString("hash");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FileRepresentation fileRepresentation = new FileRepresentation(tmpNomeFile,tmpHashFile);
+            fileRepresentationHashMap.put(tmpNomeFile, fileRepresentation);
+        }
+        return fileRepresentationHashMap;
+    }
+
+
+
 
 
     /** Questo metodo genera un JSONObject contenente un JSON Array  a partire da una lista di oggetti FileRepresentation*/
@@ -39,7 +104,7 @@ public class FileUtils {
 
         for(FileRepresentation fileRepresentation : fileRepresentationList){
             try {
-                ja.put(new JSONObject().put(fileRepresentation.nome, fileRepresentation.hash));
+                ja.put(new JSONObject().put("nome", fileRepresentation.nome).put("hash", fileRepresentation.hash));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -93,7 +158,7 @@ public class FileUtils {
             hash = new String(Hex.encodeHex(DigestUtils.md5(fis)));
             //Log.d("test IO", "bbb!");
 
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
             Log.d("test IO", "ccc!");
             //Log.d("test IO", "ECCEZIONE!");

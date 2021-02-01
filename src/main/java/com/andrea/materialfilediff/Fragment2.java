@@ -38,7 +38,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
     List<Uri> uriList = null;
     List<String> fileNames = null;
     AsyncCallRXJava2 asyncCallRXJava2 = new AsyncCallRXJava2();
-    HashSet<FileRepresentation> fileRepresentationHashSet = null;
 
 
 
@@ -179,9 +178,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
 
             }
         }
-
-
-
     }
 
 

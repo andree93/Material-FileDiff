@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,17 +28,21 @@ import io.reactivex.schedulers.Schedulers;
 public class AsyncCallRXJava2 {
 
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private ArrayList<FileRepresentation> fileRepresentationList = null;
-
+    private HashMap<String, FileRepresentation> fileRepresentationHashMap = null;
 
     public AsyncCallRXJava2() {
-        fileRepresentationList = new ArrayList<>();
+        fileRepresentationHashMap = new HashMap<>();
 
     }
 
     public ArrayList<FileRepresentation> getFileRepresentationList() {
-        return fileRepresentationList;
+        return new ArrayList<FileRepresentation>(fileRepresentationHashMap.values());
     }
+
+    public HashMap<String, FileRepresentation> getFileRepresentationHashMap() {
+        return fileRepresentationHashMap;
+    }
+
 
     public void dispose(){
         disposables.dispose();
@@ -61,7 +66,7 @@ public class AsyncCallRXJava2 {
 
 
     public void addWorks3(List<Uri> uriList, Context context, CommunicationInterface com) {
-        fileRepresentationList.clear();
+        AtomicInteger errors = new AtomicInteger(0);
         disposables.clear();
         com.enableProgressBar();
 
@@ -88,7 +93,7 @@ public class AsyncCallRXJava2 {
                             public void onError(Throwable e) { // metodo chiamato una sola volta, appena si verifica un'eccezione
                                 //Log.d("Method onError", "elementi lista: "+fileRepresentationList.size());
                                 Log.d("method onError", " method onError called"+e);
-                                fileRepresentationList.clear();
+                                fileRepresentationHashMap.clear();
                                 com.notifyError();
                             }
 
@@ -96,8 +101,11 @@ public class AsyncCallRXJava2 {
                             public void onNext(FileRepresentation value) { //metodo chiamato per ogni valore  emesso dall'observable (se non vengono sollevate eccezioni)
 
                                 Log.d("onNext", " method onNext called");
-                                fileRepresentationList.add(value);
-
+                                if(value.nome != null && value.hash != null){
+                                    fileRepresentationHashMap.put(value.nome, value);
+                                } else{
+                                    errors.incrementAndGet();
+                                }
                                 com.updateProgress();
                             }
                         })
