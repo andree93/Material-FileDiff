@@ -258,8 +258,6 @@ public class Fragment2 extends Fragment  implements View.OnClickListener, Commun
         progressBar.setProgress(0);
 //        circleProgressBar.setActivated(true);
 //        circleProgressBar.setProgress(0);
-
-
     }
 
 

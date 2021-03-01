@@ -90,7 +90,7 @@ public class AsyncCallRXJava2 {
                             }
 
                             @Override
-                            public void onError(Throwable e) { // metodo chiamato una sola volta, appena si verifica un'eccezione
+                            public void onError(Throwable e) { // metodo chiamato una sola volta, se si verifica un'eccezione. Il metodo onComplete non verrà più chiamato
                                 //Log.d("Method onError", "elementi lista: "+fileRepresentationList.size());
                                 Log.d("method onError", " method onError called"+e);
                                 fileRepresentationHashMap.clear();
@@ -101,10 +101,10 @@ public class AsyncCallRXJava2 {
                             public void onNext(FileRepresentation value) { //metodo chiamato per ogni valore  emesso dall'observable (se non vengono sollevate eccezioni)
 
                                 Log.d("onNext", " method onNext called");
-                                if(value.nome != null && value.hash != null){
+                                if(value.nome != null && value.hash != null){ //Se l'oggetto restituito contiene valori nulli nelle proprietà, assumo che ci sia stato un errore
                                     fileRepresentationHashMap.put(value.nome, value);
                                 } else{
-                                    errors.incrementAndGet();
+                                    errors.incrementAndGet(); //potrei usare questa variabile per contare gli errori. Eventualmente potrei notificare il numero degli errori mediante una chiamata ad un metodo da definire nell'interfaccia CommunicationInterface, da fare nel metodo onError
                                 }
                                 com.updateProgress();
                             }

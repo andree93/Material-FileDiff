@@ -8,21 +8,27 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Frag3ViewModel extends ViewModel {
     private SavedStateHandle state;
     String file_name_tv="JSON File...";
+    String risultato_confronto_tv = "";
     String selected_files_counter="";
     String checksum_calculated_tv="";
     String checksum_match_tv="";
     String calcola_checksum_button="";
+    String ris_letti_tv ="";
     int checksum_match_text_color;
     int progressBarVisibility = View.GONE;
     boolean isCompareChecksumButtonEnabled=false;
     boolean isReadJsonButtonEnabled=false;
+    int cancelButtonEnabled=View.GONE;
 
 
     private MutableLiveData<ArrayList<Uri>> uriList;
+
+
 
 
     public ArrayList<Uri> getUriList(){
@@ -82,12 +88,12 @@ public class Frag3ViewModel extends ViewModel {
 
 
 
-    public String getJson_load_tv() {
-        return file_name_tv;
+    public String getRisultato_confronto_tv() {
+        return risultato_confronto_tv;
     }
 
-    public void SetJson_load_tv(String file_name_tv) {
-        this.file_name_tv = file_name_tv;
+    public void setRisultato_confronto_tv(String risultato_confronto_tv) {
+        this.risultato_confronto_tv = risultato_confronto_tv;
     }
 
     public String getChecksum_calculated_tv() {
@@ -98,6 +104,16 @@ public class Frag3ViewModel extends ViewModel {
         this.checksum_calculated_tv = checksum_calculated_tv;
     }
 
+    public String getFile_name_tv() {
+        return file_name_tv;
+    }
+
+    public void setFile_name_tv(String file_name_tv) {
+        this.file_name_tv = file_name_tv;
+    }
+
+
+
     public String getChecksum_match_tv() {
         return checksum_match_tv;
     }
@@ -105,6 +121,31 @@ public class Frag3ViewModel extends ViewModel {
     public void setChecksum_match_tv(String checksum_match_tv) {
         this.checksum_match_tv = checksum_match_tv;
     }
+
+    public int getCancelButtonStatus() {
+        return cancelButtonEnabled;
+    }
+
+    public void setcancelButtonStatus(int status) {
+        this.cancelButtonEnabled = status;
+    }
+
+
+
+
+
+
+
+
+    public String getRis_letti_tv() {
+        return ris_letti_tv;
+    }
+
+    public void setRis_letti_tv(String ris_letti_tv) {
+        this.ris_letti_tv = ris_letti_tv;
+    }
+
+
 
     public String getCalcola_checksum_button() {
         return calcola_checksum_button;
